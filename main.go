@@ -29,12 +29,12 @@ func parseLinesToLoads(lines []string) []load {
 	for index, val := range lines {
 		next := pattern.FindStringSubmatch(val)
 		_ = next
-		x, _ := strconv.ParseInt(next[1], 10, 32)
-		x2, _ := strconv.ParseFloat(next[2], 64)
-		x4, _ := strconv.ParseFloat(next[3], 64)
-		x6, _ := strconv.ParseFloat(next[4], 64)
-		x8, _ := strconv.ParseFloat(next[5], 64)
-		loads[index] = createLoad(int(x), x2, x4, x6, x8)
+		id, _ := strconv.ParseInt(next[1], 10, 32)
+		startX, _ := strconv.ParseFloat(next[2], 64)
+		startY, _ := strconv.ParseFloat(next[3], 64)
+		endingX, _ := strconv.ParseFloat(next[4], 64)
+		endingY, _ := strconv.ParseFloat(next[5], 64)
+		loads[index] = createLoad(int(id), startX, startY, endingX, endingY)
 	}
 	return loads
 }
