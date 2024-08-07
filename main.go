@@ -112,7 +112,6 @@ func findOptimalLoads(loads []load) []driver {
 func main() {
 	path := os.Args[1:][0]
 	lines := getFileLines(path)
-	_ = lines
 	loads := convertStringsToLoads(lines)
 	drivers := findOptimalLoads(loads)
 	printLoads(drivers)
