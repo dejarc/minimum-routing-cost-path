@@ -1,2 +1,3 @@
-.vscode/** 
-minimum-cost-routing-path
+**/.vscode
+minimum-cost-routing-path*
+.DS_Store
