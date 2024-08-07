@@ -46,14 +46,15 @@ func convertStringsToLoads(lines []string) []load {
 		endingY, _ := strconv.ParseFloat(next[5], 64)
 		loads[index+1] = createLoad(int(id), startX, startY, endingX, endingY)
 	}
+	loads[0].visited = true // mark dummy point as visited
 	return loads
 }
 func getDistanceToHome(md float64, current point, next load) float64 {
 	return md + getDist(current, next.start) + next.distance + getDist(next.end, depot)
 }
 
-func isValid(d driver, current point, next load, visited []bool) bool {
-	return !visited[next.id] && getDistanceToHome(d.milesDriven, current, next) < maxTime
+func isValid(d float64, current point, next load) bool {
+	return !next.visited && getDistanceToHome(d, current, next) < maxTime
 }
 
 func printLoads(drivers []driver) {
@@ -70,9 +71,7 @@ func printLoads(drivers []driver) {
 }
 
 func findOptimalLoads(loads []load) []driver {
-	visited := make([]bool, len(loads))
 	totalLoads := len(loads) - 1
-	visited[0] = true
 	var drivers []driver
 	curDriver := createDriver()
 	loadsDelivered := 0
@@ -87,7 +86,7 @@ func findOptimalLoads(loads []load) []driver {
 		minMiles := math.MaxFloat64
 		minLoad := 0
 		for index, val := range loads {
-			if isValid(curDriver, origin, val, visited) && getDist(origin, val.start) < minMiles { // get minimum distance to next stop 
+			if isValid(curDriver.milesDriven, origin, val) && getDist(origin, val.start) < minMiles { // get minimum distance to next stop 
 				minMiles = getDist(origin, val.start)
 				minLoad = index
 			}
@@ -95,7 +94,7 @@ func findOptimalLoads(loads []load) []driver {
 		if minLoad != 0 { // add load to current driver
 			loadsDelivered++
 			curDriver.milesDriven += (minMiles + loads[minLoad].distance)
-			visited[minLoad] = true
+			loads[minLoad].visited = true
 			curDriver.loads = append(curDriver.loads, minLoad)
 		} else {
 			curDriver.milesDriven += getDist(origin, depot)

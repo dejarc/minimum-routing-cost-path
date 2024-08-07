@@ -9,10 +9,11 @@ type load struct {
 	start    point
 	end      point
 	distance float64
+	visited  bool
 }
 
 func createLoad(id int, sX float64, sY float64, eX float64, eY float64) load {
-	l := load{id, point{sX, sY}, point{eX, eY}, 0}
-	l.distance = getDist(l.start, l.end)
-	return l
+	start := point{sX, sY}
+	end := point{eX, eY}
+	return load{id, start, end, getDist(start, end), false}
 }
