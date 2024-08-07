@@ -38,7 +38,6 @@ func convertStringsToLoads(lines []string) map[int]load {
 	loads := make(map[int]load)
 	for _, val := range lines {
 		next := pattern.FindStringSubmatch(val)
-		_ = next
 		id, _ := strconv.ParseInt(next[1], 10, 32)
 		startX, _ := strconv.ParseFloat(next[2], 64)
 		startY, _ := strconv.ParseFloat(next[3], 64)
@@ -48,12 +47,12 @@ func convertStringsToLoads(lines []string) map[int]load {
 	}
 	return loads
 }
-func getDistanceToHome(md float64, current point, next load) float64 {
-	return md + getDist(current, next.start) + next.distance + getDist(next.end, depot)
+func getDistanceToHome(prevDistance float64, current point, next load) float64 {
+	return prevDistance + getDist(current, next.start) + next.distance + getDist(next.end, depot)
 }
 
-func isValid(d float64, current point, next load) bool {
-	return !next.visited && getDistanceToHome(d, current, next) < maxTime
+func isValid(prevDistance float64, current point, next load) bool {
+	return !next.visited && getDistanceToHome(prevDistance, current, next) < maxTime
 }
 
 func printLoads(drivers []driver) {
@@ -79,32 +78,32 @@ func findOptimalLoads(loads map[int]load) []driver {
 		if curDriver.milesDriven == 0 {
 			origin = depot
 		} else {
-			x := curDriver.loads[len(curDriver.loads)-1]
-			origin = loads[x].end
+			prevId := curDriver.loads[len(curDriver.loads)-1]
+			origin = loads[prevId].end
 		}
 		minMiles := math.MaxFloat64
-		minLoad := 0
+		minId := 0
 		for index, val := range loads {
-			if isValid(curDriver.milesDriven, origin, val) && getDist(origin, val.start) < minMiles { // get minimum distance to next stop 
+			if isValid(curDriver.milesDriven, origin, val) && getDist(origin, val.start) < minMiles { // get minimum distance to next stop
 				minMiles = getDist(origin, val.start)
-				minLoad = index
+				minId = index
 			}
 		}
 		if minMiles != math.MaxFloat64 { // add load to current driver
 			loadsDelivered++
-			curDriver.milesDriven += (minMiles + loads[minLoad].distance)
-			l := loads[minLoad]
+			curDriver.milesDriven += (minMiles + loads[minId].distance)
+			l := loads[minId]
 			l.visited = true
-			loads[minLoad] = l
-			curDriver.loads = append(curDriver.loads, loads[minLoad].id)
+			loads[minId] = l
+			curDriver.loads = append(curDriver.loads, loads[minId].id)
 		} else {
 			curDriver.milesDriven += getDist(origin, depot)
 			drivers = append(drivers, curDriver)
 			curDriver = createDriver()
 		}
 	}
-	index := curDriver.loads[len(curDriver.loads)-1]
-	curDriver.milesDriven += getDist(loads[index].end, depot)
+	lastId := curDriver.loads[len(curDriver.loads)-1]
+	curDriver.milesDriven += getDist(loads[lastId].end, depot)
 	drivers = append(drivers, curDriver)
 	return drivers
 }

@@ -1,2 +1,2 @@
 go build
-python3 evaluateShared.py --cmd "./minimum-cost-routing-path" --problemDir trainingProblems
+python3 evaluateShared.py --cmd "./minimum-routing-cost-path" --problemDir trainingProblems

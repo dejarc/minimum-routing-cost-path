@@ -1,8 +1,8 @@
 package main
 
 type driver struct {
-	loads []int
-	milesDriven float64 
+	loads       []int
+	milesDriven float64
 }
 
 func createDriver() driver {
