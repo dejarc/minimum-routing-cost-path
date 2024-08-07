@@ -33,10 +33,10 @@ func getFileLines(path string) []string {
 	return lines
 }
 
-func convertStringsToLoads(lines []string) []load {
+func convertStringsToLoads(lines []string) map[int]load {
 	pattern := regexp.MustCompile(`(\d+) \((-?[0-9]+.[0-9]+),(-?[0-9]+.[0-9]+)\) \((-?[0-9]+.[0-9]+),(-?[0-9]+.[0-9]+)\)`)
-	loads := make([]load, len(lines)+1)
-	for index, val := range lines {
+	loads := make(map[int]load)
+	for _, val := range lines {
 		next := pattern.FindStringSubmatch(val)
 		_ = next
 		id, _ := strconv.ParseInt(next[1], 10, 32)
@@ -44,9 +44,8 @@ func convertStringsToLoads(lines []string) []load {
 		startY, _ := strconv.ParseFloat(next[3], 64)
 		endingX, _ := strconv.ParseFloat(next[4], 64)
 		endingY, _ := strconv.ParseFloat(next[5], 64)
-		loads[index+1] = createLoad(int(id), startX, startY, endingX, endingY)
+		loads[int(id)] = createLoad(int(id), startX, startY, endingX, endingY)
 	}
-	loads[0].visited = true // mark dummy point as visited
 	return loads
 }
 func getDistanceToHome(md float64, current point, next load) float64 {
@@ -70,8 +69,8 @@ func printLoads(drivers []driver) {
 	}
 }
 
-func findOptimalLoads(loads []load) []driver {
-	totalLoads := len(loads) - 1
+func findOptimalLoads(loads map[int]load) []driver {
+	totalLoads := len(loads)
 	var drivers []driver
 	curDriver := createDriver()
 	loadsDelivered := 0
@@ -91,11 +90,13 @@ func findOptimalLoads(loads []load) []driver {
 				minLoad = index
 			}
 		}
-		if minLoad != 0 { // add load to current driver
+		if minMiles != math.MaxFloat64 { // add load to current driver
 			loadsDelivered++
 			curDriver.milesDriven += (minMiles + loads[minLoad].distance)
-			loads[minLoad].visited = true
-			curDriver.loads = append(curDriver.loads, minLoad)
+			l := loads[minLoad]
+			l.visited = true
+			loads[minLoad] = l
+			curDriver.loads = append(curDriver.loads, loads[minLoad].id)
 		} else {
 			curDriver.milesDriven += getDist(origin, depot)
 			drivers = append(drivers, curDriver)
