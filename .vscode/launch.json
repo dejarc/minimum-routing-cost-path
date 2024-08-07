@@ -10,7 +10,9 @@
       "request": "launch",
       "mode": "auto",
       "program": "${fileDirname}",
-      "args": ["${workspaceFolder}/Training Problems/problem20.txt"]
+      "args": [
+        "${workspaceFolder}/trainingProblems/problem12.txt"
+      ]
     }
   ]
 }
