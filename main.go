@@ -87,17 +87,17 @@ func findOptimalLoads(loads []load) []driver {
 		minMiles := math.MaxFloat64
 		minLoad := 0
 		for index, val := range loads {
-			if isValid(curDriver, origin, val, visited) && getDist(origin, val.start)+val.distance < minMiles {  
-				minMiles = getDist(origin, val.start) + val.distance
+			if isValid(curDriver, origin, val, visited) && getDist(origin, val.start) < minMiles { // get minimum distance to next stop 
+				minMiles = getDist(origin, val.start)
 				minLoad = index
 			}
 		}
 		if minLoad != 0 { // add load to current driver
 			loadsDelivered++
-			curDriver.milesDriven += minMiles
+			curDriver.milesDriven += (minMiles + loads[minLoad].distance)
 			visited[minLoad] = true
 			curDriver.loads = append(curDriver.loads, minLoad)
-		} else { // 
+		} else {
 			curDriver.milesDriven += getDist(origin, depot)
 			drivers = append(drivers, curDriver)
 			curDriver = createDriver()
