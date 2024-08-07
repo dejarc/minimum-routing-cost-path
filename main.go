@@ -48,13 +48,12 @@ func convertStringsToLoads(lines []string) []load {
 	}
 	return loads
 }
+func getDistanceToHome(md float64, current point, next load) float64 {
+	return md + getDist(current, next.start) + next.distance + getDist(next.end, depot)
+}
 
 func isValid(d driver, current point, next load, visited []bool) bool {
-	if visited[next.id] { // has been visited before
-		return false
-	}
-	newMiles := d.milesDriven + getDist(current, next.start) + next.distance + getDist(next.end, depot) // (new start - prior end) + new load distance + distance from end to home
-	return newMiles < maxTime
+	return !visited[next.id] && getDistanceToHome(d.milesDriven, current, next) < maxTime
 }
 
 func printLoads(drivers []driver) {
@@ -88,7 +87,7 @@ func findOptimalLoads(loads []load) []driver {
 		minMiles := math.MaxFloat64
 		minLoad := 0
 		for index, val := range loads {
-			if isValid(curDriver, origin, val, visited) && getDist(origin, val.start)+val.distance < minMiles { // find shortest load that also allows driver to get home under constraint 
+			if isValid(curDriver, origin, val, visited) && getDist(origin, val.start)+val.distance < minMiles {  
 				minMiles = getDist(origin, val.start) + val.distance
 				minLoad = index
 			}
@@ -111,7 +110,6 @@ func findOptimalLoads(loads []load) []driver {
 }
 
 func main() {
-	// calculateAverageCost()
 	path := os.Args[1:][0]
 	lines := getFileLines(path)
 	_ = lines
