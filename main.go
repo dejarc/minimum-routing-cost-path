@@ -94,18 +94,37 @@ func findOptimalLoads(loads map[int]load) []driver {
 			curDriver.milesDriven += (minMiles + loads[minId].distance)
 			l := loads[minId]
 			l.visited = true
+			if curDriver.avgBetween == 0 {
+				curDriver.avgBetween = minMiles
+			} else {
+				x := float64(len(curDriver.loads))
+				curDriver.avgBetween = (curDriver.avgBetween*x + minMiles) / (x + 1)
+			}
 			loads[minId] = l
 			curDriver.loads = append(curDriver.loads, loads[minId].id)
 		} else {
-			curDriver.milesDriven += getDist(origin, depot)
+			distHome := getDist(origin, depot)
+			curDriver.milesDriven += distHome
+			x := float64(len(curDriver.loads))
+			curDriver.avgBetween = (curDriver.avgBetween*x + distHome) / (x + 1)
 			drivers = append(drivers, curDriver)
+			swapLoads(drivers, loads)
 			curDriver = createDriver()
 		}
 	}
 	lastId := curDriver.loads[len(curDriver.loads)-1]
-	curDriver.milesDriven += getDist(loads[lastId].end, depot)
+	homeDist := getDist(loads[lastId].end, depot)
+	curDriver.milesDriven += homeDist
+	x := float64(len(curDriver.loads))
+	curDriver.avgBetween = (curDriver.avgBetween*x + homeDist) / (x + 1)
 	drivers = append(drivers, curDriver)
+	swapLoads(drivers, loads)
 	return drivers
+}
+func swap(first []int, firstIndex int, second []int, secondIndex int) {
+	temp := first[firstIndex]
+	first[firstIndex] = second[secondIndex]
+	second[secondIndex] = temp
 }
 
 func main() {
