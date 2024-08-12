@@ -94,12 +94,8 @@ func findOptimalLoads(loads map[int]load) []driver {
 			curDriver.milesDriven += (minMiles + loads[minId].distance)
 			l := loads[minId]
 			l.visited = true
-			if curDriver.avgBetween == 0 {
-				curDriver.avgBetween = minMiles
-			} else {
-				x := float64(len(curDriver.loads))
-				curDriver.avgBetween = (curDriver.avgBetween*x + minMiles) / (x + 1)
-			}
+			x := float64(len(curDriver.loads))
+			curDriver.avgBetween = (curDriver.avgBetween*x + minMiles) / (x + 1)
 			loads[minId] = l
 			curDriver.loads = append(curDriver.loads, loads[minId].id)
 		} else {
@@ -132,5 +128,7 @@ func main() {
 	lines := getFileLines(path)
 	loads := convertStringsToLoads(lines)
 	drivers := findOptimalLoads(loads)
+	cost := calculateTotalCost(drivers)
+	_ = cost
 	printLoads(drivers)
 }
