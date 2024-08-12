@@ -40,8 +40,13 @@ func getUpdatedAverage(newLoadId int, d driver, i int, loads map[int]load) float
 }
 
 func swapLoadsMinAvgHelper(first *driver, second *driver, loads map[int]load) {
-	avgDist := (first.avgBetween + second.avgBetween) / 2
 	for i := 0; i < len(first.loads); i++ {
+		avgDist := (first.avgBetween + second.avgBetween) / 2
+		minIndex := -1
+		var firstMiles float64 = 0
+		var secondMiles float64 = 0
+		var firstAvg float64 = 0
+		var secondAvg float64 = 0
 		for j := 0; j < len(second.loads); j++ {
 			firstDist := getUpdatedAverage(second.loads[j], *first, i, loads)
 			secondDist := getUpdatedAverage(first.loads[i], *second, j, loads)
@@ -51,13 +56,20 @@ func swapLoadsMinAvgHelper(first *driver, second *driver, loads map[int]load) {
 			newTimeFirst := firstDif + first.milesDriven + (loads[second.loads[j]].distance - loads[first.loads[i]].distance)
 			newTimeSecond := secondDif + second.milesDriven + (loads[first.loads[i]].distance - loads[second.loads[j]].distance)
 			if nextAvg < avgDist && newTimeFirst < maxTime && newTimeSecond < maxTime {
-				first.milesDriven = newTimeFirst
-				second.milesDriven = newTimeSecond
-				first.avgBetween = firstDist
-				second.avgBetween = secondDist
 				avgDist = nextAvg
-				swap(first.loads, i, second.loads, j)
+				minIndex = j
+				firstMiles = newTimeFirst
+				secondMiles = newTimeSecond
+				firstAvg = firstDist
+				secondAvg = secondDist
 			}
+		}
+		if minIndex != -1 {
+			swap(first.loads, i, second.loads, minIndex)
+			first.milesDriven = firstMiles
+			second.milesDriven = secondMiles
+			first.avgBetween = firstAvg
+			second.avgBetween = secondAvg
 		}
 	}
 }
@@ -71,18 +83,26 @@ func swapLoadsMinAvgBetween(drivers []driver, loads map[int]load) {
 }
 
 func swapLoadsHelper(first *driver, second *driver, loads map[int]load) {
-	avgDist := (first.milesDriven + second.milesDriven) / 2
 	for i := 0; i < len(first.loads); i++ {
+		avgDist := (first.milesDriven + second.milesDriven) / 2
+		var milesDrivenFirst float64 = 0
+		var milesDrivenSecond float64 = 0
+		minIndex := -1
 		for j := 0; j < len(second.loads); j++ {
 			firstDist := getUpdatedCost(second.loads[j], *first, i, loads)
 			secondDist := getUpdatedCost(first.loads[i], *second, j, loads)
 			nextAvg := (firstDist + secondDist) / 2
 			if nextAvg < avgDist && firstDist < maxTime && secondDist < maxTime {
-				swap(first.loads, i, second.loads, j)
-				first.milesDriven = firstDist
-				second.milesDriven = secondDist
+				milesDrivenFirst = firstDist
+				milesDrivenSecond = secondDist
 				avgDist = nextAvg
+				minIndex = j
 			}
+		}
+		if minIndex != -1 {
+			swap(first.loads, i, second.loads, minIndex)
+			first.milesDriven = milesDrivenFirst
+			second.milesDriven = milesDrivenSecond
 		}
 	}
 }
@@ -94,6 +114,7 @@ func swapLoadsMinAvgTotal(drivers []driver, loads map[int]load) {
 		}
 	}
 }
+
 func calculateTotalCost(drivers []driver) float64 {
 	var totalCost float64 = 0
 	for _, val := range drivers {
