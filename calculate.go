@@ -46,8 +46,8 @@ func swapLoadsMinAvgHelper(first *driver, second *driver, loads map[int]load) {
 			firstDist := getUpdatedAverage(second.loads[j], *first, i, loads)
 			secondDist := getUpdatedAverage(first.loads[i], *second, j, loads)
 			nextAvg := (firstDist + secondDist) / 2
-			firstDif := (firstDist - first.avgBetween) * float64(len(first.loads) + 1)
-			secondDif := (secondDist - second.avgBetween) * float64(len(second.loads) + 1)
+			firstDif := (firstDist - first.avgBetween) * float64(len(first.loads)+1)
+			secondDif := (secondDist - second.avgBetween) * float64(len(second.loads)+1)
 			newTimeFirst := firstDif + first.milesDriven + (loads[second.loads[j]].distance - loads[first.loads[i]].distance)
 			newTimeSecond := secondDif + second.milesDriven + (loads[first.loads[i]].distance - loads[second.loads[j]].distance)
 			if nextAvg < avgDist && newTimeFirst < maxTime && newTimeSecond < maxTime {
@@ -62,7 +62,7 @@ func swapLoadsMinAvgHelper(first *driver, second *driver, loads map[int]load) {
 	}
 }
 
-func swapLoadsMinAvg(drivers []driver, loads map[int]load) {
+func swapLoadsMinAvgBetween(drivers []driver, loads map[int]load) {
 	for i := 0; i < len(drivers); i++ {
 		for j := i + 1; j < len(drivers); j++ {
 			swapLoadsMinAvgHelper(&drivers[i], &drivers[j], loads)
@@ -87,7 +87,7 @@ func swapLoadsHelper(first *driver, second *driver, loads map[int]load) {
 	}
 }
 
-func swapLoads(drivers []driver, loads map[int]load) {
+func swapLoadsMinAvgTotal(drivers []driver, loads map[int]load) {
 	for i := 0; i < len(drivers); i++ {
 		for j := i + 1; j < len(drivers); j++ {
 			swapLoadsHelper(&drivers[i], &drivers[j], loads)

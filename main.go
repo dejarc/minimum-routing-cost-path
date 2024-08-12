@@ -108,7 +108,7 @@ func findOptimalLoads(loads map[int]load) []driver {
 			x := float64(len(curDriver.loads))
 			curDriver.avgBetween = (curDriver.avgBetween*x + distHome) / (x + 1)
 			drivers = append(drivers, curDriver)
-			swapLoads(drivers, loads)
+			swapLoadsMinAvgBetween(drivers, loads)
 			curDriver = createDriver()
 		}
 	}
@@ -118,7 +118,7 @@ func findOptimalLoads(loads map[int]load) []driver {
 	x := float64(len(curDriver.loads))
 	curDriver.avgBetween = (curDriver.avgBetween*x + homeDist) / (x + 1)
 	drivers = append(drivers, curDriver)
-	swapLoads(drivers, loads)
+	swapLoadsMinAvgTotal(drivers, loads)
 	return drivers
 }
 func swap(first []int, firstIndex int, second []int, secondIndex int) {
