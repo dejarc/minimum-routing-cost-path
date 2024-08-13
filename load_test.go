@@ -7,7 +7,7 @@ import (
 	. "github.com/dejarc/minimum-routing-cost-path"
 )
 
-var _ = Describe("Load", func() {
+var _ = Describe("load.go", func() {
 	It("should create a load", func() {
 		id := 1
 		var startX float64 = 0

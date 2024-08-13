@@ -7,7 +7,7 @@ import (
 	. "github.com/dejarc/minimum-routing-cost-path"
 )
 
-var _ = Describe("Driver", func() {
+var _ = Describe("driver.go", func() {
 	It("should create a driver", func() {
 		Expect(CreateDriver()).To(Equal(Driver{make([]int, 0), 0}))
 	})
