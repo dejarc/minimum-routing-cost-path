@@ -1,10 +1,10 @@
 package main
 
-type driver struct {
-	loads       []int
-	milesDriven float64
+type Driver struct {
+	Loads       []int
+	MilesDriven float64
 }
 
-func createDriver() driver {
-	return driver{make([]int, 0), 0}
+func CreateDriver() Driver {
+	return Driver{make([]int, 0), 0}
 }

@@ -1,19 +1,19 @@
 package main
 
-type point struct {
-	x float64
-	y float64
+type Point struct {
+	X float64
+	Y float64
 }
-type load struct {
-	id       int
-	start    point
-	end      point
-	distance float64
-	visited  bool
+type Load struct {
+	Id       int
+	Start    Point
+	End      Point
+	Distance float64
+	Visited  bool
 }
 
-func createLoad(id int, sX float64, sY float64, eX float64, eY float64) load {
-	start := point{sX, sY}
-	end := point{eX, eY}
-	return load{id, start, end, getDist(start, end), false}
+func CreateLoad(id int, sX float64, sY float64, eX float64, eY float64) Load {
+	start := Point{sX, sY}
+	end := Point{eX, eY}
+	return Load{id, start, end, GetDist(start, end), false}
 }
