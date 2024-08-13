@@ -55,7 +55,8 @@ func isValid(prevDistance float64, current point, next load) bool {
 	return !next.visited && getDistanceToHome(prevDistance, current, next) < maxTime
 }
 
-func printLoads(drivers []driver) {
+func loadsToString(drivers []driver) []string {
+	loadStrings := make([]string, 0)
 	for _, val := range drivers {
 		var str strings.Builder
 		str.WriteString("[")
@@ -64,8 +65,9 @@ func printLoads(drivers []driver) {
 		}
 		str.WriteString(fmt.Sprintf("%d", val.loads[len(val.loads)-1]))
 		str.WriteString("]")
-		fmt.Println(str.String())
+		loadStrings = append(loadStrings, str.String())
 	}
+	return loadStrings
 }
 
 func findOptimalLoads(loads map[int]load) []driver {
@@ -107,11 +109,16 @@ func findOptimalLoads(loads map[int]load) []driver {
 	drivers = append(drivers, curDriver)
 	return drivers
 }
-
+func printLoadStrings(loadStrings []string) {
+	for _, loadStr := range loadStrings {
+		fmt.Println(loadStr)
+	}
+}
 func main() {
 	path := os.Args[1:][0]
 	lines := getFileLines(path)
 	loads := convertStringsToLoads(lines)
 	drivers := findOptimalLoads(loads)
-	printLoads(drivers)
+	loadStrings := loadsToString(drivers)
+	printLoadStrings(loadStrings)
 }
