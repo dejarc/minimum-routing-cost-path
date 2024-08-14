@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minimum-routing-cost-path
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: minimum-routing-cost-path
+  template:
+    metadata:
+      labels:
+        app: minimum-routing-cost-path
+    spec:
+      containers:
+      - name: minimum-routing-cost-path
+        image: minimum-routing-cost-path:latest
+        ports:
+        - containerPort: 8080

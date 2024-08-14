@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"math"
+	"net/http"
 	"os"
 	"regexp"
 	"strconv"
@@ -55,17 +57,18 @@ func isValid(prevDistance float64, current point, next load) bool {
 	return !next.visited && getDistanceToHome(prevDistance, current, next) < maxTime
 }
 
-func printLoads(drivers []driver) {
+func formatLoads(drivers []driver) string{
+	var list []string
 	for _, val := range drivers {
 		var str strings.Builder
 		str.WriteString("[")
 		for i := 0; i < len(val.loads)-1; i++ {
 			str.WriteString(fmt.Sprintf("%d, ", val.loads[i]))
 		}
-		str.WriteString(fmt.Sprintf("%d", val.loads[len(val.loads)-1]))
-		str.WriteString("]")
-		fmt.Println(str.String())
+		str.WriteString(fmt.Sprintf("%d]", val.loads[len(val.loads)-1]))
+		list = append(list, str.String())
 	}
+	return fmt.Sprintf("[\n%v\n]", strings.Join(list[:], ",\n"))
 }
 
 func findOptimalLoads(loads map[int]load) []driver {
@@ -107,11 +110,42 @@ func findOptimalLoads(loads map[int]load) []driver {
 	drivers = append(drivers, curDriver)
 	return drivers
 }
-
-func main() {
+func parseFromFile() {
 	path := os.Args[1:][0]
 	lines := getFileLines(path)
 	loads := convertStringsToLoads(lines)
 	drivers := findOptimalLoads(loads)
-	printLoads(drivers)
+	formatLoads(drivers)
+}
+func writeInvalidReq(w http.ResponseWriter, msg string, code int) {
+	w.WriteHeader(code)
+	responseMessage := fmt.Sprintf(`{"statusCode": %d, "userMessage": "%s", "systemMessage": "%s"}`, code, msg, msg)
+	w.Write([]byte(responseMessage))
+}
+func handler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeInvalidReq(w, fmt.Sprintf("method %s not allowed for endpoint %s", r.Method, r.URL.Path), http.StatusMethodNotAllowed)
+		return
+	}
+	var reqBody []interface{}
+	err := json.NewDecoder(r.Body).Decode(&reqBody)
+	if err != nil {
+		writeInvalidReq(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+	lines := make([]string, len(reqBody))
+	for i, v := range reqBody {
+		lines[i] = v.(string)
+	}
+	loads := convertStringsToLoads(lines)
+	drivers := findOptimalLoads(loads)
+	res := formatLoads(drivers)
+	w.Header().Add("content-type", "application/json")
+	w.Header().Add("accept", "application/json")
+	w.Write([]byte(res))
+}
+func main() {
+
+	http.Handle("/get-routes", http.HandlerFunc(handler))
+	http.ListenAndServe(":8080", nil)
 }
