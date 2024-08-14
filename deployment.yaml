@@ -15,5 +15,6 @@ spec:
       containers:
       - name: minimum-routing-cost-path
         image: minimum-routing-cost-path:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
